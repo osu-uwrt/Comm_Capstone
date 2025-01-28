@@ -1,3 +1,0 @@
-struct Transmission {
-    int outputPin;
-};
