@@ -8,6 +8,7 @@ struct Reciever {
     double byteTimeLen;
 };
 
+
 int readMessage(struct Message *msg);
 
 #endif
