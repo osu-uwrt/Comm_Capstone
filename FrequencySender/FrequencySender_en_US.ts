@@ -5,37 +5,37 @@
     <name>FrequencyApplication</name>
     <message>
         <location filename="frequencyapplication.ui" line="14"/>
-        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="144"/>
+        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="145"/>
         <source>SetFrequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="frequencyapplication.ui" line="38"/>
-        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="145"/>
+        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="146"/>
         <source>Current Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="frequencyapplication.ui" line="54"/>
-        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="146"/>
+        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="147"/>
         <source>Set Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frequencyapplication.ui" line="123"/>
-        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="147"/>
+        <location filename="frequencyapplication.ui" line="126"/>
+        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="148"/>
         <source>Zero</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frequencyapplication.ui" line="136"/>
-        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="148"/>
+        <location filename="frequencyapplication.ui" line="139"/>
+        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="149"/>
         <source>Start Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frequencyapplication.ui" line="156"/>
-        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="149"/>
+        <location filename="frequencyapplication.ui" line="159"/>
+        <location filename="build/Desktop-Debug/FrequencySender_autogen/include/ui_frequencyapplication.h" line="150"/>
         <source>Frequency Setter</source>
         <translation type="unfinished"></translation>
     </message>

@@ -18,7 +18,8 @@ public:
 private:
     bool sending_;
     uint16_t maxADCValue, minADCValue;
-    int minFreq_, maxFreq_, socket_, currentFreq_;
+    int minFreq_, maxFreq_, socket_;
+    double currentFreq_;
     sockaddr_in serverAddr{};
     
     std::thread sendingThread;

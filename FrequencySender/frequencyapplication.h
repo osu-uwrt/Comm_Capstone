@@ -18,8 +18,15 @@ public:
     FrequencyApplication(QWidget *parent = nullptr);
     ~FrequencyApplication();
 
-private:
-    Ui::FrequencyApplication *ui;
+private slots:
+    // void on_zeroButton_clicked();
+    void on_setFrequencyButton_clicked();
+    void on_frequencySlider_valueChanged();
+    void on_zeroButton_clicked();
 
+private:
+    int maxFreq_, minFreq_;
+
+    Ui::FrequencyApplication *ui;
     std::unique_ptr<FrequencyGenerator> generator;
 };

@@ -4,12 +4,15 @@
 #include "chrono"
 #include "iostream"
 
-FrequencyGenerator::FrequencyGenerator(int minFreq, int maxFreq)
+#include <iostream>
+#include <fstream>
+
+FrequencyGenerator::FrequencyGenerator(int minFreq, int maxFreq) : minFreq_(minFreq), maxFreq_(maxFreq)
 {
     maxADCValue = 4096;
     minADCValue = 0;
 
-    currentFreq_ = 0;
+    currentFreq_ = -1;
 
     socket_ = socket(AF_INET, SOCK_DGRAM, 0);
     if (socket_ < 0)
@@ -36,14 +39,17 @@ FrequencyGenerator::~FrequencyGenerator()
 
 void FrequencyGenerator::setFrequency(double frequency)
 {
-    currentFreq_ = minFreq_ + frequency * (maxFreq_ - minFreq_);
+    currentFreq_ = (double)minFreq_ + frequency * (maxFreq_ - minFreq_);
 }
 
 void FrequencyGenerator::sendFrequency()
 {
+    int num = 0;
+    std::ofstream file;
+    file.open("/home/markc/OSU/ECE4905/Comm_Capstone/samples.txt");
     while (sending_)
     {
-        if (currentFreq_ == 0)
+        if (currentFreq_ == -1)
         {
             uint16_t message = htons(0);
 
@@ -53,11 +59,13 @@ void FrequencyGenerator::sendFrequency()
             continue;
         }
         auto now = std::chrono::high_resolution_clock::now().time_since_epoch();
-        auto currentNanoSeconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now).count() % 1000000000;
+        auto currentNanoSeconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now).count();
 
         double nsAsDouble = (double)currentNanoSeconds / 1e9;
 
-        uint16_t message = htons(maxADCValue * sin(currentFreq_ * nsAsDouble) + maxADCValue / 2);
+        uint16_t msg = maxADCValue / 2 * sin(currentFreq_ * nsAsDouble * 2 * M_PI) + maxADCValue / 2;
+
+        uint16_t message = htons(maxADCValue / 2 * sin(currentFreq_ * nsAsDouble * 2 * M_PI) + maxADCValue / 2);
 
         ssize_t sent = sendto(socket_, &message, sizeof(message), 0,
                               (sockaddr *)&serverAddr, sizeof(serverAddr));
@@ -65,6 +73,18 @@ void FrequencyGenerator::sendFrequency()
         {
             perror("Send failed");
             break;
+        }
+
+        if (num < 500000)
+        {
+            file << std::to_string(msg) << ",";
+            file << std::to_string(nsAsDouble) << "\n";
+            num++;
+        }
+        else if (num == 500000)
+        {
+            file.close();
+            num++;
         }
     }
 }
