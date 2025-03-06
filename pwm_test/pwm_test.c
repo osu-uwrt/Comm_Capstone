@@ -7,11 +7,11 @@
 #define MESSAGE_SLICE 0
 #define MESSAGE_CHANNEL PWM_CHAN_A
 #define TIMING_SLICE 1
-#define MESSAGE_DURATION 100000
+#define MESSAGE_DURATION 10000
 #define PWM_CLOCK_FREQ 125000000
 #define DUTY_CYCLE 0.5
 #define MESSAGE_BUFFER_LEN 10
-int* messageFrequencyBuffer;
+int messageFrequencyBuffer[MESSAGE_BUFFER_LEN];
 int messageIndex = 0;
 
 void updateFrequency();
@@ -24,8 +24,6 @@ int main()
         printf("countdown: %d\n", i);
         sleep_ms(1000);
     }
-
-    messageFrequencyBuffer = (int*)malloc(MESSAGE_BUFFER_LEN * sizeof(int));
     
     //make the current list of frequencies start at 10kHz and go up by 1kHz each
     for(int i = 0; i < MESSAGE_BUFFER_LEN; i++){
@@ -48,10 +46,6 @@ int main()
     //enable pwm for timing
     pwm_set_wrap(TIMING_SLICE, MESSAGE_DURATION);
     pwm_set_enabled(TIMING_SLICE, true);
-
-
-    free(messageFrequencyBuffer);
-
 
     /*while (true) {
         printf("Hello, world!\n");
