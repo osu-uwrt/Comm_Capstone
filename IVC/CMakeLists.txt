@@ -15,9 +15,9 @@ if(WIN32)
 else()
     set(USERHOME $ENV{HOME})
 endif()
-set(sdkVersion 2.1.1)
-set(toolchainVersion 14_2_Rel1)
-set(picotoolVersion 2.1.1)
+set(sdkVersion 2.1.0)
+set(toolchainVersion 13_2_Rel1)
+set(picotoolVersion 2.1.0)
 set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
 if (EXISTS ${picoVscode})
     include(${picoVscode})
@@ -34,25 +34,28 @@ project(IVC C CXX ASM)
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
-add_library(dsp src/tools/dsp.c)
-add_library(communication src/communication/message.c src/communication/receiver.c)
-target_link_libraries(communication dsp hardware_adc hardware_dma -lm)
+# add_library(dsp src/tools/dsp.c)
+# target_link_libraries(dsp -lm)
+# add_library(communication src/communication/receiver.c src/communication/message.c)
+# target_link_libraries(communication dsp hardware_adc hardware_dma)
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(IVC IVC.c )
+add_executable(IVC IVC.c src/tools/dsp.c src/communication/message.c src/communication/receiver.c)
 
 pico_set_program_name(IVC "IVC")
 pico_set_program_version(IVC "0.1")
 
-# Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(IVC 0)
-pico_enable_stdio_usb(IVC 1)
-
 # Add the standard library to the build
 target_link_libraries(IVC
         pico_stdlib
-        communication)
+        hardware_adc
+        hardware_dma
+        -lm)
+
+# Modify the below lines to enable/disable output over UART/USB
+pico_enable_stdio_uart(IVC 0)
+pico_enable_stdio_usb(IVC 1)
 
 # Add the standard include files to the build
 target_include_directories(IVC PRIVATE

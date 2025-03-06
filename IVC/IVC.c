@@ -17,6 +17,7 @@
 int main()
 {
     stdio_init_all();
+    // stdio_usb_init();
 
     // Set up our UART
     uart_init(UART_ID, BAUD_RATE);
@@ -25,21 +26,22 @@ int main()
     gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
     gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
 
-    struct Receiver receiver;
+    Receiver_t receiver;
     setupReceiver(&receiver, 28);
     setupADC(&receiver);
 
     while (true)
     {
         printf("Waiting for signal\n");
-        if (adc_read() > 50)
+        // printf("reading: %d\n", adc_read());
+        if (adc_read() > 1000)
         {
             break;
         }
     }
     printf("Got signal\n");
 
-    struct Message msg;
+    Message msg;
     char string[MAX_MESSAGE_SIZE];
     readFromADC(&receiver, &msg, string);
 

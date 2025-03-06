@@ -2,7 +2,7 @@
 
 #include "communication/message.h"
 
-int convertMessageToFrequencies(char *message, struct Message *frequencies, int messageSize)
+int convertMessageToFrequencies(char *message, Message *frequencies, int messageSize)
 {
     if (MAX_MESSAGE_SIZE * 2 < messageSize * 2)
     {
@@ -19,7 +19,7 @@ int convertMessageToFrequencies(char *message, struct Message *frequencies, int 
     return 0;
 }
 
-int frequenciesToMessage(struct Message *frequencies, char *message)
+int frequenciesToMessage(Message *frequencies, char *message)
 {
     for (int i = 0; i < MAX_MESSAGE_SIZE; i++)
     {

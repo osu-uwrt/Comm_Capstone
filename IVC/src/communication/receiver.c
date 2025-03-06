@@ -5,11 +5,11 @@
 #include "communication/receiver.h"
 #include "tools/dsp.h"
 
-void setupReceiver(struct Receiver *rec, int inputPin)
+void setupReceiver(Receiver_t *rec, int inputPin)
 {
     rec->inputPin_ = inputPin;
 }
-void setupADC(struct Receiver *rec)
+void setupADC(Receiver_t *rec)
 {
     adc_gpio_init(rec->inputPin_);
 
@@ -33,19 +33,20 @@ void setupADC(struct Receiver *rec)
 
     printf("Arming DMA\n");
     sleep_ms(1000);
+
     // Set up the DMA to start transferring data as soon as it appears in FIFO
     rec->dmaChannel_ = dma_claim_unused_channel(true);
     rec->dmaCfg_ = dma_channel_get_default_config(rec->dmaChannel_);
 
     // Reading from constant address, writing to incrementing byte addresses
-    channel_config_set_transfer_data_size(&rec->dmaCfg_, DMA_SIZE_8);
+    channel_config_set_transfer_data_size(&rec->dmaCfg_, DMA_SIZE_16);
     channel_config_set_read_increment(&rec->dmaCfg_, false);
     channel_config_set_write_increment(&rec->dmaCfg_, true);
 
     // Pace transfers based on availability of ADC samples
     channel_config_set_dreq(&rec->dmaCfg_, DREQ_ADC);
 }
-void readFromADC(struct Receiver *rec, struct Message *message, char *string)
+void readFromADC(Receiver_t *rec, Message *message, char *string)
 {
     printf("Starting capture\n");
     dma_channel_configure(rec->dmaChannel_, &rec->dmaCfg_,
