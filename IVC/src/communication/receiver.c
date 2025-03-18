@@ -66,14 +66,35 @@ void readFromADC(Receiver_t *rec, Message *message, char *string)
 
     bandpassFilter(rec->samples, rec->filteredSamples, SAMPLES_PER_NIBBLE * MAX_MESSAGE_SIZE * 2);
 
-    for (int i = 0; i < SAMPLES_PER_NIBBLE * MAX_MESSAGE_SIZE * 2; i += SAMPLES_PER_NIBBLE)
-    {
-        message->frequencies[i / SAMPLES_PER_NIBBLE] = getFrequency(rec->filteredSamples + (i * SAMPLES_PER_NIBBLE), SAMPLES_PER_NIBBLE);
-    }
+    // printf("Ran filter\n");
 
-    for (int i = 0; i < 40; i++) {
-        printf("Frequency: %f\n", message->frequencies[i]);
-    }
+    double freq = getFrequency(rec->filteredSamples, SAMPLES_PER_NIBBLE * MAX_MESSAGE_SIZE * 2);
 
-    frequenciesToMessage(message, string);
+    printf("Frequency: %f\n", freq);
+
+    /* 
+    If you want to print out filtered samples
+    */
+
+    // for (int i = 0; i < SAMPLES_PER_NIBBLE * MAX_MESSAGE_SIZE * 2; i++) {
+    //     printf("%f\n", rec->filteredSamples[i]);
+    // } 
+
+    // for (int i = 0; i < SAMPLES_PER_NIBBLE * MAX_MESSAGE_SIZE * 2; i += SAMPLES_PER_NIBBLE)
+    // {
+    //     // printf("%f", i / SAMPLES_PER_NIBBLE);
+    //     message->frequencies[i / SAMPLES_PER_NIBBLE] = getFrequency(rec->filteredSamples + i, SAMPLES_PER_NIBBLE);
+    // }
+
+    // printf("Got frequencies\n");
+
+    /* 
+    If you want to print out the frequencies seen
+    */
+
+    // for (int i = 0; i < MAX_MESSAGE_SIZE * 2; i++) {
+    //     printf("Frequency: %f\n", message->frequencies[i]);
+    // }
+
+    // frequenciesToMessage(message, string);
 }

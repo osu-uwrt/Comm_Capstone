@@ -11,5 +11,5 @@ with open("/home/markc/OSU/ECE4905/bpfC/build/filtered.csv") as filterSignal:
         noisySignal[reader.line_num] = row[2]
 
 plt.plot(filteredSignal)
-plt.plot(noisySignal)
+# plt.plot(noisySignal)
 plt.show()

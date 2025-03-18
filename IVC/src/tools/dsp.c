@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdio.h>
 
 #include "tools/dsp.h"
 
@@ -36,9 +37,22 @@ double getFrequency(double *filteredSamples, int size)
     int lastPeak = -1;
     double totalFrequency = 0;
     double numPeaks = 0;
+
+    // For checks, probably have to change to derivatives
+    // double max = -1;
+    // for (int i = 0; i < size; i++) {
+    //     if (filteredSamples[i] > max) {
+    //         max = filteredSamples[i];
+    //     }
+    // }
+    // if (max <= 1) {
+    //     printf("Too small max\n");
+    //     return 0;
+    // }
+
     for (int i = 5; i < size; i++)
     {
-        if (filteredSamples[i] > 100 && fabs(filteredSamples[i] - filteredSamples[i - 1]) < 5)
+        if (filteredSamples[i] > 10 && fabs(filteredSamples[i] - filteredSamples[i - 1]) < 5)
         {
             if (i - lastPeak > 10)
             {
@@ -60,12 +74,14 @@ double getFrequency(double *filteredSamples, int size)
         double frequency = totalFrequency / numPeaks;
         if (frequency > 20200 || frequency < 14800)
         {
+            printf("Outside range\n");
             return 0;
         }
         return frequency;
     }
     else
     {
+        printf("No peaks\n");
         return 0;
     }
 }

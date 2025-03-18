@@ -29,21 +29,35 @@ int main()
     Receiver_t receiver;
     setupReceiver(&receiver, 28);
     setupADC(&receiver);
-
-    while (true)
-    {
-        printf("Waiting for signal\n");
-        // printf("reading: %d\n", adc_read());
-        if (adc_read() > 1000)
-        {
-            break;
-        }
-    }
-    printf("Got signal\n");
-
     Message msg;
-    char string[MAX_MESSAGE_SIZE];
-    readFromADC(&receiver, &msg, string);
+    char string[MAX_MESSAGE_SIZE + 1];
 
-    printf("%s\n", string);
+    while (true) {
+        readFromADC(&receiver, &msg, string);
+    }
+
+    // while (true)
+    // {
+    //     printf("Waiting for signal\n");
+    //     uint16_t read = adc_read();
+    //     printf("reading: %i\n", read);
+    //     if (read > (uint16_t) 3000)
+    //     {
+    //         break;
+    //     }
+    // }
+    // // while (true)
+    // printf("Got signal\n");
+    // // for (int i = 0; i < 5; i++) {
+    // //     printf("%d\n", i);
+    // //     sleep_ms(1e3);
+    // // }
+
+    // Message msg;
+    // char string[MAX_MESSAGE_SIZE + 1];
+    // readFromADC(&receiver, &msg, string);
+
+    // string[MAX_MESSAGE_SIZE] = '\00';
+
+    // printf("message: %s\n", string);
 }

@@ -3,7 +3,7 @@
 
 #include "hardware/dma.h"
 
-#define SAMPLES_PER_NIBBLE 1000
+#define SAMPLES_PER_NIBBLE 100
 
 #include "communication/message.h"
 

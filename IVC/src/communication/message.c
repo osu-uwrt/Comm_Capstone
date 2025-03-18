@@ -27,6 +27,7 @@ int frequenciesToMessage(Message *frequencies, char *message)
         unsigned int first = 0, second = 0;
         first = (unsigned int)((frequencies->frequencies[i * 2] - MIN_FREQUENCY) / 250.);
         second = (unsigned int)((frequencies->frequencies[i * 2 + 1] - MIN_FREQUENCY) / 250.);
+        // printf("%d, %d\n", first, second);
 
         if (first > 7)
         {
@@ -36,19 +37,7 @@ int frequenciesToMessage(Message *frequencies, char *message)
         {
             currentChar += ((char) first << 4) + (char) second;
         }
+        // printf("%c\n", currentChar);
         message[i] = currentChar;
     }
 }
-
-// void messageToSamples(struct Message *frequencies, int maxFrequencies, int samples[BYTE_SAMPLE_LENGTH * MAX_MESSAGE_SIZE * 2]) {
-//     int sampleRate = 500000;
-//     int phase = 0;
-//     double ts = 1. / sampleRate;
-
-//     for (int frequency = 0; frequency < MAX_MESSAGE_SIZE * 2; frequency++) {
-
-//         for (int i = 0; i < BYTE_SAMPLE_LENGTH; i++) {
-//             sample = sin(2 * M_PI * frequencies->frequencies[frequency] * (BYTE_SAMPLE_LENGTH * MAX_MESSAGE_SIZE * 2))
-//         }
-//     }
-// }

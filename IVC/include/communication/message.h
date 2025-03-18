@@ -2,9 +2,10 @@
 #define MESSAGE_H
 
 #include <stdio.h>
-#define MAX_MESSAGE_SIZE 7
+#define MAX_MESSAGE_SIZE 1
 #define MIN_FREQUENCY 15500
-#define BYTE_SAMPLE_LENGTH 1000
+// This is same as SAMPLES_PER_NIBBLE 
+// #define BYTE_SAMPLE_LENGTH 100
 
 typedef struct Message_ {
     double frequencies[MAX_MESSAGE_SIZE * 2];
