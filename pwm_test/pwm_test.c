@@ -4,23 +4,24 @@
 #include "hardware/irq.h"
 #include "hardware/pwm.h"
 
-#define MESSAGE_SLICE 0
-#define MESSAGE_CHANNEL PWM_CHAN_A
-#define TIMING_SLICE 1
-#define MESSAGE_DURATION 10000
-#define PWM_CLOCK_FREQ 125000000
+//use pin 7 for message outputs
+#define MESSAGE_SLICE 3
+#define MESSAGE_CHANNEL 1
+#define MESSAGE_PIN 7
+#define MESSAGE_DURATION 1000
+#define PWM_CLOCK_FREQ 125000000.0
 #define DUTY_CYCLE 0.5
-#define MESSAGE_BUFFER_LEN 10
-int messageFrequencyBuffer[MESSAGE_BUFFER_LEN];
-int messageIndex = 0;
+#define MESSAGE_BUFFER_LEN 11
+volatile int messageFrequencyBuffer[MESSAGE_BUFFER_LEN];
+volatile int messageIndex = 0;
 
-void updateFrequency();
+bool updateFrequency(struct repeating_timer *t);
 
 int main()
 {
     stdio_init_all();
 
-    for (int i=5; i >= 0; i--) {
+    for (int i=6; i >= 1; i--) {
         printf("countdown: %d\n", i);
         sleep_ms(1000);
     }
@@ -30,48 +31,49 @@ int main()
         messageFrequencyBuffer[i] = (10+i) * 1000;
     }
 
-    // use pin 0 for PWM output
-    gpio_set_function(MESSAGE_SLICE * 2, GPIO_FUNC_PWM);
+    // use pin 7 for PWM output
+    gpio_set_function(MESSAGE_PIN, GPIO_FUNC_PWM);
 
-    //allow interrupts for the timing PWM slice
-    pwm_clear_irq(TIMING_SLICE);
-    pwm_set_irq_enabled(TIMING_SLICE, true);
-    irq_set_exclusive_handler(PWM_DEFAULT_IRQ_NUM(), updateFrequency);
-    irq_set_enabled(PWM_DEFAULT_IRQ_NUM(), true);
-
-    //enable pwm for messages and have it start out always outputting low
-    pwm_set_chan_level(MESSAGE_SLICE, MESSAGE_CHANNEL, 0);
+    //enable pwm for messages
     pwm_set_enabled(MESSAGE_SLICE, true);
 
-    //enable pwm for timing
-    pwm_set_wrap(TIMING_SLICE, MESSAGE_DURATION);
-    pwm_set_enabled(TIMING_SLICE, true);
+    //repeat the frequency updates
+    struct repeating_timer messageTimer;
+    add_repeating_timer_us(-MESSAGE_DURATION,updateFrequency,NULL,&messageTimer);
 
-    /*while (true) {
-        printf("Hello, world!\n");
-        sleep_ms(1000);
-    }*/
+    while(true){
+        sleep_ms(20);
+    }
+
 }
 
-void updateFrequency(){
-    //clear interrupt flag
-    pwm_clear_irq(TIMING_SLICE);
+bool updateFrequency(struct repeating_timer *t){
+
+    //printf("hello\n");
+
 
     //get the next frequency to be played in the message
     int currentFreq = messageFrequencyBuffer[messageIndex];
-    int period = currentFreq/PWM_CLOCK_FREQ - 1;
+    int period = PWM_CLOCK_FREQ/currentFreq - 1;
+
+    printf("%d, %d, %d\n",messageIndex, currentFreq, period);
+
 
     //change the frequency of the message signal
     pwm_set_wrap(MESSAGE_SLICE, period);
     pwm_set_chan_level(MESSAGE_SLICE, MESSAGE_CHANNEL, DUTY_CYCLE * period);
 
 
-    //update the index to go to the next frequency or loop around if the end is reached
+    //update the index to go to the next frequency 
     //you can change how the end of the list is handled
-    if(messageIndex < MESSAGE_BUFFER_LEN){
+    if(messageIndex < MESSAGE_BUFFER_LEN - 1){
         messageIndex ++;
     }else{
-        messageIndex = 0;
+        //messageIndex = 0;
+        cancel_repeating_timer(t);
+        pwm_set_chan_level(MESSAGE_SLICE, MESSAGE_CHANNEL, 0);
     }
+
+    return true;
 }
 
