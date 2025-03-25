@@ -3,6 +3,8 @@
 #include "pico/stdlib.h"
 #include "hardware/irq.h"
 #include "hardware/pwm.h"
+#include "message.h"
+#include "transmission.h"
 
 //use pin 7 for message outputs
 #define MESSAGE_SLICE 3
@@ -15,7 +17,7 @@
 volatile int messageFrequencyBuffer[MESSAGE_BUFFER_LEN];
 volatile int messageIndex = 0;
 
-bool updateFrequency(struct repeating_timer *t);
+//bool updateFrequency(struct repeating_timer*);
 
 int main()
 {
@@ -47,6 +49,11 @@ int main()
 
 }
 
+void sendMessage(Message_t *frequencies, int messageSize){
+    
+
+}
+
 bool updateFrequency(struct repeating_timer *t){
 
     //printf("hello\n");
@@ -56,7 +63,7 @@ bool updateFrequency(struct repeating_timer *t){
     int currentFreq = messageFrequencyBuffer[messageIndex];
     int period = PWM_CLOCK_FREQ/currentFreq - 1;
 
-    printf("%d, %d, %d\n",messageIndex, currentFreq, period);
+    //printf("%d, %d, %d\n",messageIndex, currentFreq, period);
 
 
     //change the frequency of the message signal
@@ -64,8 +71,7 @@ bool updateFrequency(struct repeating_timer *t){
     pwm_set_chan_level(MESSAGE_SLICE, MESSAGE_CHANNEL, DUTY_CYCLE * period);
 
 
-    //update the index to go to the next frequency 
-    //you can change how the end of the list is handled
+    //update the index to go to the next frequency or stop if the end is reached
     if(messageIndex < MESSAGE_BUFFER_LEN - 1){
         messageIndex ++;
     }else{
