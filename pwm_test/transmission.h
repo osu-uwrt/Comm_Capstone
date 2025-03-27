@@ -2,19 +2,27 @@
 
 #define MESSAGE_DURATION 1000
 #define PWM_CLOCK_FREQ 125000000.0
+#define RESPONSE_FREQ 15000
+
 
 typedef struct Transmission {
     int outputPin_;
-
+    int outputSlice_;
+    int outputChannel_;
     int dutyCycle_;
+    int messageIndex_;
 } Transmission_t;
 
-
+typedef struct TransmissionData {
+    Message_t msg;
+    Transmission_t trns;
+    repeating_timer_t messageTimer;
+} TransmissionData_t;
 
 void setupTransmission(Transmission_t trns);
 
-void sendMessage(Message_t *frequencies, Transmission_t trns);
+void sendMessage(TransmissionData_t *data);
 
 void sendResponse(Transmission_t trns);
 
-bool updateFrequency(struct repeating_timer *t);
+bool updateFrequency(repeating_timer_t *t);

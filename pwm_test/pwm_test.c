@@ -40,7 +40,7 @@ int main()
     pwm_set_enabled(MESSAGE_SLICE, true);
 
     //repeat the frequency updates
-    struct repeating_timer messageTimer;
+    repeating_timer_t messageTimer;
     add_repeating_timer_us(-MESSAGE_DURATION,updateFrequency,NULL,&messageTimer);
 
     while(true){
@@ -49,13 +49,7 @@ int main()
 
 }
 
-void sendMessage(Message_t *frequencies, int messageSize){
-    
-    
-
-}
-
-bool updateFrequency(struct repeating_timer *t){
+bool updateFrequency(repeating_timer_t *t){
 
     //printf("hello\n");
 
