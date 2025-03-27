@@ -10,6 +10,11 @@ typedef struct Transmission {
 } Transmission_t;
 
 
-void sendMessage(Message_t *frequencies, Transmission_t transmission);
+
+void setupTransmission(Transmission_t trns);
+
+void sendMessage(Message_t *frequencies, Transmission_t trns);
+
+void sendResponse(Transmission_t trns);
 
 bool updateFrequency(struct repeating_timer *t);
