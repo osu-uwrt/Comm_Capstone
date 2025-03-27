@@ -21,7 +21,7 @@ typedef struct TransmissionData {
 
 void setupTransmission(Transmission_t trns);
 
-void sendMessage(TransmissionData_t *data);
+bool sendMessage(TransmissionData_t *data);
 
 void sendResponse(Transmission_t trns);
 
