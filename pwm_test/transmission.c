@@ -20,7 +20,7 @@ void setupTransmission(Transmission_t trns){
 }
 
 bool sendMessage(TransmissionData_t *data){
-    
+
     bool slotAvailable = add_repeating_timer_us(-MESSAGE_DURATION, updateFrequency, (void*)data, &(data->messageTimer));
     
     //print an error message if no slots are available
@@ -34,6 +34,15 @@ bool sendMessage(TransmissionData_t *data){
 
 void sendResponse(Transmission_t trns){
 
+    //send just one beep
+    TransmissionData_t responseData;
+    Message_t transmissionMessage;
+    transmissionMessage.frequencies = [RESPONSE_FREQ];
+
+    responseData.msg = transmissionMessage;
+    responseData.trns = trns;
+
+    sendMessage(responseData);
 }
 
 bool updateFrequency(struct repeating_timer *t){
