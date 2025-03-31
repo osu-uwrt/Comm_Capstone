@@ -32,7 +32,7 @@ bool sendMessage(TransmissionData_t *data){
     
 }
 
-void sendResponse(Transmission_t trns){
+bool sendResponse(Transmission_t trns){
 
     //send just one beep
     TransmissionData_t responseData;
@@ -42,7 +42,7 @@ void sendResponse(Transmission_t trns){
     responseData.msg = transmissionMessage;
     responseData.trns = trns;
 
-    sendMessage(responseData);
+    return sendMessage(responseData);
 }
 
 bool updateFrequency(struct repeating_timer *t){

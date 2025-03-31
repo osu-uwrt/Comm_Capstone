@@ -23,6 +23,6 @@ void setupTransmission(Transmission_t trns);
 
 bool sendMessage(TransmissionData_t *data);
 
-void sendResponse(Transmission_t trns);
+bool sendResponse(Transmission_t trns);
 
 bool updateFrequency(repeating_timer_t *t);
