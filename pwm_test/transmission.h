@@ -19,7 +19,7 @@ typedef struct TransmissionData {
     repeating_timer_t messageTimer;
 } TransmissionData_t;
 
-void setupTransmission(Transmission_t trns);
+void setupTransmission(Transmission_t *trns);
 
 bool sendMessage(TransmissionData_t *data);
 

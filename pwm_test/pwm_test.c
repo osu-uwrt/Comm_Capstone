@@ -13,9 +13,8 @@
 #define MESSAGE_DURATION 1000
 #define PWM_CLOCK_FREQ 125000000.0
 #define DUTY_CYCLE 0.5
-#define MESSAGE_BUFFER_LEN 11
-volatile int messageFrequencyBuffer[MESSAGE_BUFFER_LEN];
-volatile int messageIndex = 0;
+#define MESSAGE_BUFFER_LEN 8
+volatile int messageFrequencyBuffer[MESSAGE_BUFFER_LEN] = {15625,16129,16667,17241,17857,18519,19231,20000};
 
 //bool updateFrequency(struct repeating_timer*);
 
@@ -28,53 +27,26 @@ int main()
         sleep_ms(1000);
     }
     
-    //make the current list of frequencies start at 10kHz and go up by 1kHz each
-    for(int i = 0; i < MESSAGE_BUFFER_LEN; i++){
-        messageFrequencyBuffer[i] = (10+i) * 1000;
+    TransmissionData_t bigboye;
+
+    //set up the transmission with the correct numbers
+    bigboye.trns.dutyCycle_ = 0.5;
+    bigboye.trns.messageIndex_ = 0;
+    bigboye.trns.outputChannel_ = 1;
+    bigboye.trns.outputSlice_ = 3;
+    bigboye.trns.outputPin_ = 7;
+
+    //add a message to the transmission data object
+    for(int i=0; i<MESSAGE_BUFFER_LEN; i++){
+        bigboye.msg.frequencies[i] = messageFrequencyBuffer[i];
     }
 
-    // use pin 7 for PWM output
-    gpio_set_function(MESSAGE_PIN, GPIO_FUNC_PWM);
+    setupTransmission(&(bigboye.trns));
 
-    //enable pwm for messages
-    pwm_set_enabled(MESSAGE_SLICE, true);
-
-    //repeat the frequency updates
-    repeating_timer_t messageTimer;
-    add_repeating_timer_us(-MESSAGE_DURATION,updateFrequency,NULL,&messageTimer);
+    sendMessage(&bigboye);
 
     while(true){
-        sleep_ms(20);
+        sleep_ms(1000);
     }
 
 }
-
-bool updateFrequency(repeating_timer_t *t){
-
-    //printf("hello\n");
-
-
-    //get the next frequency to be played in the message
-    int currentFreq = messageFrequencyBuffer[messageIndex];
-    int period = PWM_CLOCK_FREQ/currentFreq - 1;
-
-    //printf("%d, %d, %d\n",messageIndex, currentFreq, period);
-
-
-    //change the frequency of the message signal
-    pwm_set_wrap(MESSAGE_SLICE, period);
-    pwm_set_chan_level(MESSAGE_SLICE, MESSAGE_CHANNEL, DUTY_CYCLE * period);
-
-
-    //update the index to go to the next frequency or stop if the end is reached
-    if(messageIndex < MESSAGE_BUFFER_LEN - 1){
-        messageIndex ++;
-    }else{
-        //messageIndex = 0;
-        cancel_repeating_timer(t);
-        pwm_set_chan_level(MESSAGE_SLICE, MESSAGE_CHANNEL, 0);
-    }
-
-    return true;
-}
-
