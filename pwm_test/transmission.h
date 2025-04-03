@@ -9,7 +9,7 @@ typedef struct Transmission {
     int outputPin_;
     int outputSlice_;
     int outputChannel_;
-    int dutyCycle_;
+    double dutyCycle_;
     int messageIndex_;
 } Transmission_t;
 

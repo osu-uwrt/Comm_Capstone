@@ -22,18 +22,16 @@ int main()
 {
     stdio_init_all();
 
-    for (int i=6; i >= 1; i--) {
+    /*for (int i=6; i >= 1; i--) {
         printf("countdown: %d\n", i);
         sleep_ms(1000);
-    }
+    }*/
     
     TransmissionData_t bigboye;
 
     //set up the transmission with the correct numbers
     bigboye.trns.dutyCycle_ = 0.5;
     bigboye.trns.messageIndex_ = 0;
-    bigboye.trns.outputChannel_ = 1;
-    bigboye.trns.outputSlice_ = 3;
     bigboye.trns.outputPin_ = 7;
 
     //add a message to the transmission data object
@@ -45,6 +43,7 @@ int main()
 
     sendMessage(&bigboye);
 
+    //make the rp2040 do nothing so that the sounds can be played
     while(true){
         sleep_ms(1000);
     }
