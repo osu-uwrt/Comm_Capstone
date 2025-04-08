@@ -22,8 +22,8 @@ int convertStringToMessage(const char *string, Message_t *message, int messageSi
         bit_count += 8;
 
         while (bit_count >= 3)
-        {                                                                        // Extract 3-bit chunks
-            int value = (packed >> (bit_count - 3)) & 0x7;                       // Get top 3 bits
+        {                                                  // Extract 3-bit chunks
+            int value = (packed >> (bit_count - 3)) & 0x7; // Get top 3 bits
             printf("%d\n", value);
             message->frequencies[index++] = freqList[value]; // Map to frequency
             bit_count -= 3;
@@ -81,4 +81,13 @@ int messageToString(Message_t *message, char *string)
     }
 
     string[++char_index] = '\0'; // Null-terminate the string
+}
+
+double convertSampleDiffToFreq(int sampleDiff)
+{
+    if (sampleDiff == 0)
+    {
+        return 0;
+    }
+    return 1. / ((1. / 500000) * sampleDiff);
 }

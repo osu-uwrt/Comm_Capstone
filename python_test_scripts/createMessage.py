@@ -50,7 +50,7 @@ with open(f"/home/markc/Downloads/testMessage.csv", "w") as out:
     for i in range(2):
         randomDelay = 0
         if  i == 0:
-            randomDelay = random.randrange(580, 600)
+            randomDelay = random.randrange(0, 500)
         print(f"Random delay: {randomDelay}")
         # Write frequency into test message file
         for j in range(samplesPerFrequency - randomDelay):

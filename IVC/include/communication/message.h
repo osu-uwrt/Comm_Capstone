@@ -17,11 +17,13 @@ extern int freqList[];
 
 typedef struct Message
 {
-    int frequencies[MAX_BIT_SIZE / 3];
+    int frequencies[4 + MAX_BIT_SIZE / 3];
 } Message_t;
 
 int convertStringToMessage(const char *string, Message_t *message, int messageSize);
 
 int messageToString(Message_t *message, char *string);
+
+double convertSampleDiffToFreq(int sampleDiff);
 
 #endif // MESSAGE_H
