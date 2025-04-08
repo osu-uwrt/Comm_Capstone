@@ -5,8 +5,8 @@
 
 #include <stdint.h>
 
-void applyIIRFilter(double *filteredSamples, uint8_t *samples_, double *b, double *a, int order, int samplesSize);
-void bandpassFilter(uint8_t *samples_, double *filteredSamples_, int size);
-double getFrequency(double *filteredSamples, int size);
+void applyIIRFilter(int *filteredSamples, uint8_t *samples_, double *b, double *a, int order, int samplesSize);
+void bandpassFilter(uint8_t *samples_, int *filteredSamples_, int size);
+int getSampleDifference(int *filteredSamples, int size);
 
 #endif // DSP_H

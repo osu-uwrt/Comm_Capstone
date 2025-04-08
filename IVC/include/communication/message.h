@@ -2,17 +2,26 @@
 #define MESSAGE_H
 
 #include <stdio.h>
-#define MAX_MESSAGE_SIZE 1
-#define MIN_FREQUENCY 15500
-// This is same as SAMPLES_PER_NIBBLE 
-// #define BYTE_SAMPLE_LENGTH 100
+// Max number of bits that can be sent
+#define MAX_BIT_SIZE 33
+// Largest string that can be sent
+#define MAX_STRING_SIZE MAX_BIT_SIZE / 8 + 2
+// Number of samples expected per frequency
+#define SAMPLES_PER_FREQUENCY 1000
+// Initial Frequency at start of every message
+#define INITIAL_SAMPLE_DIFFERENCE 32
+// Sends initial frequency twice, with 0 buffer of length SAMPLES_PER_FREQUENCY
+#define MAX_INITIAL_FREQUENCY_LEN SAMPLES_PER_FREQUENCY * 4
 
-typedef struct Message_ {
-    double frequencies[MAX_MESSAGE_SIZE * 2];
-} Message;
+extern int freqList[];
 
-int convertMessageToFrequencies(char *message, Message *frequencies, int messageSize);
+typedef struct Message
+{
+    int frequencies[MAX_BIT_SIZE / 3];
+} Message_t;
 
-int frequenciesToMessage(Message *frequencies, char *message);
+int convertStringToMessage(const char *string, Message_t *message, int messageSize);
+
+int messageToString(Message_t *message, char *string);
 
 #endif // MESSAGE_H

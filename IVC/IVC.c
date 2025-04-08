@@ -27,37 +27,27 @@ int main()
     gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
 
     Receiver_t receiver;
-    setupReceiver(&receiver, 28);
     setupADC(&receiver);
-    Message msg;
-    char string[MAX_MESSAGE_SIZE + 1];
+    
+    Message_t msg;
+    char string[MAX_STRING_SIZE];
 
-    while (true) {
-        readFromADC(&receiver, &msg, string);
+    while (true)
+    {
+
+        while (true)
+        {
+            printf("Waiting for signal\n");
+            uint16_t read = adc_read();
+            printf("reading: %i\n", read);
+            if (read > (uint16_t)1000)
+            {
+                break;
+            }
+        }
+        readFromADC(&receiver);
+        decodeMessage(&receiver, &msg, string);
+
+        printf("message: %s\n", string);
     }
-
-    // while (true)
-    // {
-    //     printf("Waiting for signal\n");
-    //     uint16_t read = adc_read();
-    //     printf("reading: %i\n", read);
-    //     if (read > (uint16_t) 3000)
-    //     {
-    //         break;
-    //     }
-    // }
-    // // while (true)
-    // printf("Got signal\n");
-    // // for (int i = 0; i < 5; i++) {
-    // //     printf("%d\n", i);
-    // //     sleep_ms(1e3);
-    // // }
-
-    // Message msg;
-    // char string[MAX_MESSAGE_SIZE + 1];
-    // readFromADC(&receiver, &msg, string);
-
-    // string[MAX_MESSAGE_SIZE] = '\00';
-
-    // printf("message: %s\n", string);
 }

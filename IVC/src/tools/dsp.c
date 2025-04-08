@@ -3,81 +3,80 @@
 
 #include "tools/dsp.h"
 
-void applyIIRFilter(double *filteredSamples, uint8_t *samples_, double *b, double *a, int order, int samplesSize)
+void applyIIRFilter(int *filteredSamples, uint8_t *samples_, double *b, double *a, int order, int samplesSize)
 {
+    double previous[order];
     for (int i = 0; i < samplesSize; i++)
     {
-        filteredSamples[i] = b[0] * samples_[i];
+        double filteredSample = b[0] * samples_[i];
         for (int j = 1; j < order + 1; j++)
         {
             if (i - j >= 0)
             {
-                filteredSamples[i] += b[j] * samples_[i - j];
+                filteredSample += b[j] * samples_[i - j];
             }
         }
         for (int j = 1; j < order + 1; j++)
         {
             if (i - j >= 0)
             {
-                filteredSamples[i] -= a[j] * filteredSamples[i - j];
+                filteredSample -= a[j] * previous[order - j];
             }
         }
+        if (i < order)
+        {
+            previous[i] = filteredSample;
+        }
+        else
+        {
+            for (int j = 0; j < order - 1; j++)
+            {
+                previous[j] = previous[j + 1];
+            }
+            previous[order - 1] = filteredSample;
+        }
+        filteredSamples[i] = (int)filteredSample;
     }
 }
 
-void bandpassFilter(uint8_t *samples_, double *filteredSamples_, int size)
+void bandpassFilter(uint8_t *samples_, int *filteredSamples_, int size)
 {
-    double b[5] = {0.0018, 0, -0.0036, 0, 0.0018};
-    double a[5] = {1.0000, -3.7861, 5.4626, -3.5575, 0.8830};
+    double b[5] = {0.0018,       0, -0.0036,       0, 0.0018};
+    double a[5] = {1.0000, -3.7861,  5.4626, -3.5575, 0.8830};
     applyIIRFilter(filteredSamples_, samples_, b, a, 4, size);
 }
 
-double getFrequency(double *filteredSamples, int size)
+int getSampleDifference(int *filteredSamples, int size)
 {
     int lastPeak = -1;
     double totalFrequency = 0;
-    double numPeaks = 0;
-
-    // For checks, probably have to change to derivatives
-    // double max = -1;
-    // for (int i = 0; i < size; i++) {
-    //     if (filteredSamples[i] > max) {
-    //         max = filteredSamples[i];
-    //     }
-    // }
-    // if (max <= 1) {
-    //     printf("Too small max\n");
-    //     return 0;
-    // }
-
-    for (int i = 5; i < size; i++)
+    double differences = 0;
+    int numPeaks = 0;
+    int bufferSize = 20;
+    for (int i = bufferSize; i < size - bufferSize; i++)
     {
-        if (filteredSamples[i] > 10 && fabs(filteredSamples[i] - filteredSamples[i - 1]) < 5)
+        if (filteredSamples[i] > 0 && fabs(filteredSamples[i] - filteredSamples[i - 1]) < 2)
         {
-            if (i - lastPeak > 10)
+            if (lastPeak != -1)
             {
-                if (lastPeak != -1)
+                int sampleDifference = i - lastPeak;
+                if (sampleDifference > 23 && sampleDifference < 35)
                 {
-                    double detectedFrequency = SAMPLE_RATE / (i - lastPeak);
-                    if (detectedFrequency > 14700 && detectedFrequency < 20900)
-                    {
-                        totalFrequency += detectedFrequency;
-                        numPeaks++;
-                    }
+                    differences += sampleDifference;
+                    numPeaks++;
+                    // printf("%d\n", sampleDifference);
                 }
-                lastPeak = i;
             }
+            lastPeak = i;
+            i += 10;
         }
     }
     if (numPeaks > 0)
     {
-        double frequency = totalFrequency / numPeaks;
-        if (frequency > 20200 || frequency < 14800)
-        {
-            printf("Outside range\n");
-            return 0;
-        }
-        return frequency;
+        double avgPeak = differences / numPeaks; 
+        // return (int)(avgPeak < 0 ? (avgPeak - 0.5) : (avgPeak + 0.5));
+        printf("Avg Peaks: %f, Num Peaks: %d\n", avgPeak, numPeaks);
+        return (int)(avgPeak < 0 ? (avgPeak - 0.5) : (avgPeak + 0.5));
     }
     else
     {

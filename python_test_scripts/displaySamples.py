@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import csv
 
+numSamples = 5001
+
 def apply_iir_filter(x, b, a):
     """
     Apply an IIR filter to the input signal x using the given coefficients b and a.
@@ -44,22 +46,24 @@ def bandpass_filter(x):
     # Apply filter
     return apply_iir_filter(x, b, a)
 
-fileLen = 14903
-filteredSignal = np.zeros((fileLen, 1))
+filteredSignal = np.zeros((numSamples, 1))
 noisySignal = np.zeros_like(filteredSignal)
-# with open("/home/markc/OSU/ECE4905/bpfC/build/filtered.csv") as filterSignal:
-with open("/home/markc/Downloads/testMessage.csv") as filterSignal:
+with open("/home/markc/Documents/TestCSVs/20000kHz.csv") as filterSignal:
+# with open("/home/markc/close.csv") as filterSignal:
     reader = csv.reader(filterSignal)
     for row in reader:
-        if reader.line_num > fileLen - 1:
+        if reader.line_num > numSamples:
             break
-        # filteredSignal[reader.line_num] = row[1]
-        noisySignal[reader.line_num] = row[0]
+        # print(row)
+        noisySignal[reader.line_num] = row[1]
+        filteredSignal[reader.line_num] = row[2]
 
-filtered = bandpass_filter(noisySignal)
-# plt.plot(filteredSignal[1000:2000])
-plt.plot(noisySignal)
+# filtered = bandpass_filter(filteredSignal)
+# plt.plot(filteredSignal)#[1000:2000])
+# plt.plot(noisySignal)
+plt.scatter(range(numSamples), filteredSignal)
+plt.scatter(range(numSamples), noisySignal)
 # plt.scatter(range(89664), filteredSignal)
 # plt.scatter(range(1000), filteredSignal[1000:2000])
-plt.plot(filtered)
+# plt.plot(filtered)
 plt.show()

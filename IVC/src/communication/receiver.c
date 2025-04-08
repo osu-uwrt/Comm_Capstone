@@ -1,17 +1,42 @@
-#include <hardware/adc.h>
-#include <hardware/dma.h>
 #include <pico/time.h>
 
 #include "communication/receiver.h"
 #include "tools/dsp.h"
 
-void setupReceiver(Receiver_t *rec, int inputPin)
-{
-    rec->inputPin_ = inputPin;
+int lookForStart(Receiver_t *rec) {
+    int currentChain = 0, i = 0;
+    for (i = 0; i < SAMPLES_PER_FREQUENCY; i++) {
+        if (rec->samples[i] == 0) {
+            currentChain++;
+        } else {
+            currentChain = 0;
+        }
+        if (currentChain > 100) {
+            printf("Found end of first frequency: %d\n", i);
+            i -= 99;
+            break;
+        }
+    }
+    int potentialStart = getSampleDifference(rec->filteredSamples, i);
+    printf("Got start sample diff: %d\n", potentialStart);
+    if (potentialStart != INITIAL_SAMPLE_DIFFERENCE) {
+        printf("Expected first start frequency %d, got %d\n", INITIAL_SAMPLE_DIFFERENCE, potentialStart);
+        return -1;
+    }
+    i += SAMPLES_PER_FREQUENCY;
+    potentialStart = getSampleDifference(&rec->filteredSamples[i], SAMPLES_PER_FREQUENCY);
+    printf("Got second sample diff: %d\n", potentialStart);
+    if (potentialStart != INITIAL_SAMPLE_DIFFERENCE) {
+        printf("Expected second start frequency %d, got %d\n", INITIAL_SAMPLE_DIFFERENCE, potentialStart);
+        return -2;
+    }
+    i += SAMPLES_PER_FREQUENCY * 2;
+    return i;
 }
+
 void setupADC(Receiver_t *rec)
 {
-    adc_gpio_init(rec->inputPin_);
+    adc_gpio_init(INPUT_PIN);
 
     adc_init();
     adc_select_input(2);
@@ -39,20 +64,20 @@ void setupADC(Receiver_t *rec)
     rec->dmaCfg_ = dma_channel_get_default_config(rec->dmaChannel_);
 
     // Reading from constant address, writing to incrementing byte addresses
-    channel_config_set_transfer_data_size(&rec->dmaCfg_, DMA_SIZE_16);
+    channel_config_set_transfer_data_size(&rec->dmaCfg_, DMA_SIZE_8);
     channel_config_set_read_increment(&rec->dmaCfg_, false);
     channel_config_set_write_increment(&rec->dmaCfg_, true);
 
     // Pace transfers based on availability of ADC samples
     channel_config_set_dreq(&rec->dmaCfg_, DREQ_ADC);
 }
-void readFromADC(Receiver_t *rec, Message *message, char *string)
+void readFromADC(Receiver_t *rec)
 {
     printf("Starting capture\n");
     dma_channel_configure(rec->dmaChannel_, &rec->dmaCfg_,
                           rec->samples,                              // dst
                           &adc_hw->fifo,                             // src
-                          SAMPLES_PER_NIBBLE * MAX_MESSAGE_SIZE * 2, // transfer count
+                          SAMPLES_PER_FREQUENCY * MAX_BIT_SIZE / 3 + MAX_INITIAL_FREQUENCY_LEN, // transfer count
                           true                                       // start immediately
     );
     adc_run(true);
@@ -63,38 +88,22 @@ void readFromADC(Receiver_t *rec, Message *message, char *string)
 
     adc_run(false);
     adc_fifo_drain();
+}
 
-    bandpassFilter(rec->samples, rec->filteredSamples, SAMPLES_PER_NIBBLE * MAX_MESSAGE_SIZE * 2);
+void decodeMessage(Receiver_t *rec, Message_t *message, char *string)
+{
+    bandpassFilter(rec->samples, rec->filteredSamples, MAX_INITIAL_FREQUENCY_LEN + SAMPLES_PER_FREQUENCY * MAX_BIT_SIZE / 3);
 
     // printf("Ran filter\n");
+    int startMessagePos = lookForStart(rec);
 
-    double freq = getFrequency(rec->filteredSamples, SAMPLES_PER_NIBBLE * MAX_MESSAGE_SIZE * 2);
+    printf("Message starts at %d\n", startMessagePos);
 
-    printf("Frequency: %f\n", freq);
+    for (int i = startMessagePos; i < SAMPLES_PER_FREQUENCY * MAX_BIT_SIZE / 3 + MAX_INITIAL_FREQUENCY_LEN; i += SAMPLES_PER_FREQUENCY)
+    {
+        // printf("i: %d\n", i);
+        message->frequencies[(i - startMessagePos) / SAMPLES_PER_FREQUENCY] =  getSampleDifference(&rec->filteredSamples[i], SAMPLES_PER_FREQUENCY);
+    }
 
-    /* 
-    If you want to print out filtered samples
-    */
-
-    // for (int i = 0; i < SAMPLES_PER_NIBBLE * MAX_MESSAGE_SIZE * 2; i++) {
-    //     printf("%f\n", rec->filteredSamples[i]);
-    // } 
-
-    // for (int i = 0; i < SAMPLES_PER_NIBBLE * MAX_MESSAGE_SIZE * 2; i += SAMPLES_PER_NIBBLE)
-    // {
-    //     // printf("%f", i / SAMPLES_PER_NIBBLE);
-    //     message->frequencies[i / SAMPLES_PER_NIBBLE] = getFrequency(rec->filteredSamples + i, SAMPLES_PER_NIBBLE);
-    // }
-
-    // printf("Got frequencies\n");
-
-    /* 
-    If you want to print out the frequencies seen
-    */
-
-    // for (int i = 0; i < MAX_MESSAGE_SIZE * 2; i++) {
-    //     printf("Frequency: %f\n", message->frequencies[i]);
-    // }
-
-    // frequenciesToMessage(message, string);
+    messageToString(message, string);
 }
