@@ -1,9 +1,9 @@
 #ifndef COMMUNICATION_H
 #define COMMUNICATION_H
 
-#include "receiver.h"
-#include "transmission.h"
-#include "message.h"
+#include "communication/receiver.h"
+#include "communication/transmittor.h"
+#include "communication/message.h"
 
 enum Status
 {
@@ -19,7 +19,7 @@ typedef struct Communication
     enum Status status_;
 } Communication_t;
 
-int createCommuncation(int inputPin, int outputPin);
-int sendMessage(Message_t *message);
+int createCommuncation(Communication_t *radio, Receiver_t *receiver, Transmission_t *transmittor);
+int sendCommMessage(Communication_t *radio, char *string, int stringSize);
 
 #endif // COMMUNICATION_H

@@ -5,8 +5,8 @@
 
 int lookForStart(Receiver_t *rec) {
     int currentChain = 0, i = 0;
-    for (i = 0; i < SAMPLES_PER_FREQUENCY; i++) {
-        if (rec->samples[i] == 0) {
+    for (i = 0; i < SAMPLES_PER_FREQUENCY * 2; i++) {
+        if (rec->samples[i] <= 20) {
             currentChain++;
         } else {
             currentChain = 0;
@@ -17,20 +17,21 @@ int lookForStart(Receiver_t *rec) {
             break;
         }
     }
+    printf("Found end of first frequency: %d\n", i);
     int potentialStart = getSampleDifference(rec->filteredSamples, i);
     printf("Got start sample diff: %d\n", potentialStart);
     if (potentialStart != INITIAL_SAMPLE_DIFFERENCE) {
         printf("Expected first start frequency %d, got %d\n", INITIAL_SAMPLE_DIFFERENCE, potentialStart);
         return -1;
     }
-    i += SAMPLES_PER_FREQUENCY;
-    potentialStart = getSampleDifference(&rec->filteredSamples[i], SAMPLES_PER_FREQUENCY);
-    printf("Got second sample diff: %d\n", potentialStart);
-    if (potentialStart != INITIAL_SAMPLE_DIFFERENCE) {
-        printf("Expected second start frequency %d, got %d\n", INITIAL_SAMPLE_DIFFERENCE, potentialStart);
-        return -2;
-    }
     i += SAMPLES_PER_FREQUENCY * 2;
+    // potentialStart = getSampleDifference(&rec->filteredSamples[i], SAMPLES_PER_FREQUENCY);
+    // printf("Got second sample diff: %d\n", potentialStart);
+    // if (potentialStart != INITIAL_SAMPLE_DIFFERENCE) {
+    //     printf("Expected second start frequency %d, got %d\n", INITIAL_SAMPLE_DIFFERENCE, potentialStart);
+    //     return -2;
+    // }
+    // i += SAMPLES_PER_FREQUENCY * 2;
     return i;
 }
 
@@ -39,7 +40,7 @@ void setupADC(Receiver_t *rec)
     adc_gpio_init(INPUT_PIN);
 
     adc_init();
-    adc_select_input(2);
+    adc_select_input(0);
     adc_fifo_setup(
         true,  // Write each completed conversion to the sample FIFO
         true,  // Enable DMA data request (DREQ)
@@ -74,6 +75,7 @@ void setupADC(Receiver_t *rec)
 void readFromADC(Receiver_t *rec)
 {
     printf("Starting capture\n");
+    // uint64_t start = time_us_64();
     dma_channel_configure(rec->dmaChannel_, &rec->dmaCfg_,
                           rec->samples,                              // dst
                           &adc_hw->fifo,                             // src
@@ -88,6 +90,9 @@ void readFromADC(Receiver_t *rec)
 
     adc_run(false);
     adc_fifo_drain();
+    // uint64_t end = time_us_64();
+
+    // printf("Took %fms\n", (double) (end - start) / 1e3);
 }
 
 void decodeMessage(Receiver_t *rec, Message_t *message, char *string)
@@ -95,15 +100,37 @@ void decodeMessage(Receiver_t *rec, Message_t *message, char *string)
     bandpassFilter(rec->samples, rec->filteredSamples, MAX_INITIAL_FREQUENCY_LEN + SAMPLES_PER_FREQUENCY * MAX_BIT_SIZE / 3);
 
     // printf("Ran filter\n");
+    // for (int i = 0; i < 4000; i++) {
+    //     printf("%d, %d, %d\n", i, rec->samples[i], rec->filteredSamples[i]);
+    // }
     int startMessagePos = lookForStart(rec);
 
     printf("Message starts at %d\n", startMessagePos);
 
-    for (int i = startMessagePos; i < SAMPLES_PER_FREQUENCY * MAX_BIT_SIZE / 3 + MAX_INITIAL_FREQUENCY_LEN; i += SAMPLES_PER_FREQUENCY)
+    for (int i = startMessagePos; i < SAMPLES_PER_FREQUENCY * MAX_BIT_SIZE / 3 + startMessagePos; i += SAMPLES_PER_FREQUENCY)
     {
         // printf("i: %d\n", i);
         message->frequencies[(i - startMessagePos) / SAMPLES_PER_FREQUENCY] =  getSampleDifference(&rec->filteredSamples[i], SAMPLES_PER_FREQUENCY);
     }
+    printf("Converting message to string\n");
 
     messageToString(message, string);
+}
+
+int detectResponse(Receiver_t *rec) {
+    readFromADC(rec);
+
+    int currentChain = 0, i = 0;
+    for (i = 0; i < SAMPLES_PER_FREQUENCY; i++) {
+        if (rec->samples[i] == 0) {
+            currentChain++;
+        } else {
+            currentChain = 0;
+        }
+        if (currentChain > 100) {
+            printf("Found end of first frequency: %d\n", i);
+            i -= 99;
+            break;
+        }
+    }
 }

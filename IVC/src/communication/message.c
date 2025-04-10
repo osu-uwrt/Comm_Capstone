@@ -16,6 +16,14 @@ int convertStringToMessage(const char *string, Message_t *message, int messageSi
     int bit_count = 0;
     int index = 0;
 
+    for (int i = 0; i < 4; i++) {
+        if (i < 2) {
+            message->frequencies[index++] = freqList[0];
+        } else {
+            message->frequencies[index++] = 0;
+        }
+    }
+
     for (int i = 0; i < messageSize; i++)
     {
         packed = (packed << 8) | string[i]; // Pack character
@@ -79,8 +87,8 @@ int messageToString(Message_t *message, char *string)
             bit_count -= 8;
         }
     }
-
-    string[++char_index] = '\0'; // Null-terminate the string
+    printf("Add null terminate string\n");
+    string[char_index] = '\0'; // Null-terminate the string
 }
 
 double convertSampleDiffToFreq(int sampleDiff)

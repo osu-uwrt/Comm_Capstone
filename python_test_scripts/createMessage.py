@@ -20,7 +20,7 @@ for frequency in frequencies:
             
     frequencySamples.append(samples)
     
-message = "test"
+message = "haha"
 
 packed = 0
 bitCount = 0

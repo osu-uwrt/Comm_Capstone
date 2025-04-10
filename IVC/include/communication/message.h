@@ -7,7 +7,7 @@
 // Largest string that can be sent
 #define MAX_STRING_SIZE MAX_BIT_SIZE / 8 + 2
 // Number of samples expected per frequency
-#define SAMPLES_PER_FREQUENCY 1000
+#define SAMPLES_PER_FREQUENCY 2250
 // Initial Frequency at start of every message
 #define INITIAL_SAMPLE_DIFFERENCE 32
 // Sends initial frequency twice, with 0 buffer of length SAMPLES_PER_FREQUENCY

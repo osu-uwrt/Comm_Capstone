@@ -41,7 +41,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(IVC IVC.c src/tools/dsp.c src/communication/message.c src/communication/receiver.c src/communication/transmittor.c)
+add_executable(IVC IVC.c src/tools/dsp.c src/communication/message.c src/communication/receiver.c src/communication/transmittor.c src/communication/communication.c)
 
 pico_set_program_name(IVC "IVC")
 pico_set_program_version(IVC "0.1")

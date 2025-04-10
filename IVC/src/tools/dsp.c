@@ -41,6 +41,7 @@ void applyIIRFilter(int *filteredSamples, uint8_t *samples_, double *b, double *
 
 void bandpassFilter(uint8_t *samples_, int *filteredSamples_, int size)
 {
+    printf("Size: %d\n", size);
     double b[5] = {0.0018,       0, -0.0036,       0, 0.0018};
     double a[5] = {1.0000, -3.7861,  5.4626, -3.5575, 0.8830};
     applyIIRFilter(filteredSamples_, samples_, b, a, 4, size);

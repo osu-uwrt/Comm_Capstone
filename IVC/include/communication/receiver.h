@@ -1,7 +1,7 @@
 #ifndef RECEIVER_H
 #define RECEIVER_H
 
-#define INPUT_PIN 28
+#define INPUT_PIN 26
 
 #include <hardware/adc.h>
 #include <hardware/dma.h>
@@ -23,5 +23,7 @@ typedef struct Receiver {
 void setupADC(Receiver_t *rec);
 void readFromADC(Receiver_t *rec);
 void decodeMessage(Receiver_t *rec, Message_t *message, char *string);
+
+int detectResponse(Receiver_t *rec);
 
 #endif // RECEIVER_H
