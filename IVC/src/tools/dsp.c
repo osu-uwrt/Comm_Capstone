@@ -53,7 +53,7 @@ int getSampleDifference(int *filteredSamples, int size)
     double totalFrequency = 0;
     double differences = 0;
     int numPeaks = 0;
-    int bufferSize = 20;
+    int bufferSize = 10;
     for (int i = bufferSize; i < size - bufferSize; i++)
     {
         if (filteredSamples[i] > 0 && fabs(filteredSamples[i] - filteredSamples[i - 1]) < 2)

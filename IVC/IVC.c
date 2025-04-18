@@ -43,7 +43,7 @@ int main()
     setupTransmission(&transmittor, OUTPUT_PIN, DUTY_CYCLE);
 
     Message_t message;
-    convertStringToMessage("tank", &message, 4);
+    convertStringToMessage("blah", &message, 4);
 
     sendMessage(&transmittor, &message);
 
@@ -51,7 +51,7 @@ int main()
 
     sleep_ms(10000);
 
-    printf("Done\n");
+    // printf("Done\n");
 
     // Receiver_t receiver;
     // setupADC(&receiver);
@@ -67,13 +67,14 @@ int main()
     //     printf("Waiting for signal\n");
     //     uint16_t read = adc_read();
     //     printf("reading: %i\n", read);
-    //     if (read > (uint16_t)1000)
+    //     if (read > (uint16_t)500)
     //     {
     //         break;
     //     }
     // }
     // readFromADC(&receiver);
     // decodeMessage(&receiver, &msg, string);
+    // sleep_ms(1000);
 
     // printf("message: %s\n", string);
     // }

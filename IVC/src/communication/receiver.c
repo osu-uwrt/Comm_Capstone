@@ -22,7 +22,7 @@ int lookForStart(Receiver_t *rec) {
     printf("Got start sample diff: %d\n", potentialStart);
     if (potentialStart != INITIAL_SAMPLE_DIFFERENCE) {
         printf("Expected first start frequency %d, got %d\n", INITIAL_SAMPLE_DIFFERENCE, potentialStart);
-        return -1;
+        // return -1;
     }
     i += SAMPLES_PER_FREQUENCY * 2;
     // potentialStart = getSampleDifference(&rec->filteredSamples[i], SAMPLES_PER_FREQUENCY);
@@ -104,6 +104,9 @@ void decodeMessage(Receiver_t *rec, Message_t *message, char *string)
     //     printf("%d, %d, %d\n", i, rec->samples[i], rec->filteredSamples[i]);
     // }
     int startMessagePos = lookForStart(rec);
+    if (startMessagePos == -1) {
+        startMessagePos = SAMPLES_PER_FREQUENCY * 2;
+    }
 
     printf("Message starts at %d\n", startMessagePos);
 
